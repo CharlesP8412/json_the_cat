@@ -7,22 +7,25 @@ Search Query
  */
 const request = require('request');
 
-// Take user input w. process ARGV
-const argInput = process.argv.splice(2);
-// Parse out Input, URL & filePath
-const breedToFind = argInput[0];
-
-//Request the siberian data
-request(`https://api.thecatapi.com/v1/breeds/search?q=${breedToFind.toLowerCase()}`, (error, response, body) => {
-  //Converts Dl'd Body STRING into an Object (array w. object)
-  if (error) {
-    throw new Error(error);
-  } else {
-    const data = JSON.parse(body);
-    if (data.length !== 0) {
-      // Print Dl'd desc. of the breed
-      console.log(data[0].description);
+const fetchBreedDescription = function(breedName, callback) {
+  // console.log("Searching...")
+  //Request the siberian data
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
+    //Converts Dl'd Body STRING into an Object (array w. object)
+    if (error) {
+      // console.log("REQUEST ERROR")
+      throw new Error(error);
+    } else {
+      const data = JSON.parse(body);
+      if (data.length !== 0) {
+        // Print Dl'd desc. of the breed
+        // console.log("Returning data...")
+        callback(null, data[0].description);
+      } else {
+        callback('Not Found', null);
+      }
     }
-    console.log("No data found");
-  }
-});
+  });
+};
+
+module.exports = { fetchBreedDescription };
